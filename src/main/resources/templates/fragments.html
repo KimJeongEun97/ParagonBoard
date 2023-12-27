@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="header(member)" class="top-bar">
+    <div class="content">
+        <a href="/" class="main-button">
+        <img src="images/paragon-logo2.jpg" alt="로고" class="top-left logo" onclick="gohome()">
+        <h2 class="top-left top-home">Paragon Board</h2>
+        </th:block>
+        </a>
+        <nav class="top-right">
+            <ul>
+                <th:block th:if="${member == null}">
+                    <li><a th:href="@{boardList}">게시판</a></li>
+                    <li><a th:href="@{guestList}">방명록</a></li>
+                    <li><a th:href="@{loginForm}">로그인</a></li>
+                    <li><a th:href="@{joinForm}">회원가입</a></li>
+                </th:block>
+                <th:block th:unless="${member == null}">
+                    <li><a th:href="@{boardList}">게시판</a></li>
+                    <li><a th:href="@{guestList}">방명록</a></li>
+                    <li th:text="${member.m_name} + '님'"></li>
+                    <li><a th:href="@{logout}">로그아웃</a></li>
+                </th:block>
+                <th:block th:unless="${member == null}" th:class="gradebox">
+                    <li th:text="'Point: '+${member.m_point}+'점'"></li>
+                    <li th:text="'등급: '+${member.g_name}"></li>
+                </th:block>
+            </ul>
+        </nav>
+    </div>
+</div>
+<div th:fragment="footer" class="footer-bar">
+    <div class="content">
+        <div class="fcontents">
+            <img src="images/paragon-logo.jpg" alt="footer-logo" class="footer-logo">
+            <span class="footer-txt">
+                &copy;Paragon Data Platform 2023
+            </span>
+        </div>
+    </div>
+</div>
+<div th:fragment="footer2" class="footer-bar2">
+    <div class="content">
+        <div class="fcontents">
+            <img src="images/paragon-logo.jpg" alt="footer-logo" class="footer-logo">
+            <span class="footer-txt">
+                &copy;Paragon Data Platform 2023
+            </span>
+        </div>
+    </div>
+</div>
+<div th:fragment="footer3" class="footer-bar3">
+    <div class="content">
+        <div class="fcontents">
+            <img src="images/paragon-logo.jpg" alt="footer-logo" class="footer-logo">
+            <span class="footer-txt">
+                &copy;Paragon Data Platform 2023
+            </span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

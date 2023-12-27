@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail</title>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script th:inline="javascript">
+        $(function () {
+            //메시지 출력
+            let m = [[${msg}]];
+            if (m != null) {
+                alert(m);
+            } //복사하여 index.html에도 넣기
+        });
+    </script>
+</head>
+<body class="detailbackground">
+<header>
+    <th:block th:insert="~{fragments::header(${session.member})}"/>
+</header>
+<section>
+    <div class="content">
+        <div class="write-form">
+            <div class="user-info">
+                <div class="user-info-sub" th:object="${session.member}">
+                    <p th:text="'등급['+*{g_name}+']'"></p>
+                    <p th:text="'POINT['+*{m_point}+']'"></p>
+                </div>
+            </div>
+
+            <h2 class="login-header" style="color: white">상세 보기</h2>
+            <div>
+                <div class="t_content p-15 content_h">NUM</div>
+                <div class="d_content p-35 content_h" th:text="${board.b_num}"></div>
+                <div class="t_content p-15 content_h">VIEWS</div>
+                <div class="d_content p-35 content_h" th:text="${board.b_views}"></div>
+            </div>
+            <div>
+                <div class="t_content p-15 content_h">WRITER</div>
+                <div class="d_content p-35 content_h" th:text="${board.m_name}"></div>
+                <div class="t_content p-15 content_h">DATE</div>
+                <div class="d_content p-35 content_h" th:text="${board.b_date}"></div>
+            </div>
+            <div>
+                <div class="t_content p-15 content_h">TITLE</div>
+                <div class="d_content p-85 content_h" th:text="${board.b_title}"></div>
+            </div>
+            <div>
+                <div class="t_content2 p-15 content_h3">CONTENTS</div>
+                <div class="d_content2 p-85 content_h2"
+                     style="overflow:auto;" th:text="${board.b_contents}"></div>
+            </div>
+            <!--첨부된 파일 보기-->
+            <div>
+                <th:block th:unless="${#lists.isEmpty(bfList)}">
+                    <div class="t_content p-15 content_h3">PREVIEW</div>
+                    <div class="d_content2 p-85 file_h2" style="overflow:auto">
+                        <th:block th:each="fitem:${bfList}">
+                            <th:block th:if="${#strings.contains(fitem.bf_oriname, '.jpg')}">
+                                <img th:src="@{upload/}+${fitem.bf_sysname}" width="500">
+                            </th:block>
+                        </th:block>
+                        <th:block th:each="fitem:${bfList}">
+                            <th:block th:if="${#strings.contains(fitem.bf_oriname, '.png')}">
+                                <img th:src="@{upload/}+${fitem.bf_sysname}" width="500">
+                            </th:block>
+                        </th:block>
+                        <th:block th:each="fitem:${bfList}">
+                            <th:block th:if="${#strings.contains(fitem.bf_oriname, '.gif')}">
+                                <img th:src="@{upload/}+${fitem.bf_sysname}" width="500">
+                            </th:block>
+                        </th:block>
+                        <th:block th:each="fitem:${bfList}">
+                            <th:block th:if="${#strings.contains(fitem.bf_oriname, '.webp')}">
+                                <img th:src="@{upload/}+${fitem.bf_sysname}" width="500">
+                            </th:block>
+                        </th:block>
+                        <th:block th:each="fitem:${bfList}">
+                            <th:block th:if="${#strings.contains(fitem.bf_oriname, '.mp4')}">
+                                <video width="500" height="auto" controls>
+                                    <source th:src="@{upload/}+${fitem.bf_sysname}" type="video/mp4">
+                            </th:block>
+                        </th:block>
+                    </div>
+                </th:block>
+            </div>
+            <!--첨부된 파일 보기-->
+            <div class="t_content p-15 file_h">FILES</div>
+            <div class="d_content p-85 file_h" style="overflow: auto">
+                <th:block th:if="${#lists.isEmpty(bfList)}">
+                    첨부된 파일이 없습니다
+                </th:block>
+                <th:block th:unless="${#lists.isEmpty(bfList)}">
+                    <th:block th:each="fitem:${bfList}">
+                        <a th:href="@{download(bf_sysname=${fitem.bf_sysname},bf_oriname=${fitem.bf_oriname})}">
+                            <span class="file-title" th:text="${fitem.bf_oriname}"></span>
+                        </a>
+                    </th:block>
+                </th:block>
+            </div>
+            <!--수정,삭제,돌아가기 버튼-->
+            <div class="btn-area2" style="margin-bottom: 10px">
+                <button class="login-btn2" id="upbtn">수정</button>
+                <button class="login-btn2" id="delbtn">삭제</button>
+                <button class="login-btn2" id="backbtn">뒤로</button>
+            </div>
+            <!--댓글 출력 부분-->
+            <div id="rSpace">
+                <th:block th:each="ritem:${rList}">
+                    <div class="t_content p-50 content_h" th:text="${ritem.r_id}"></div>
+                    <div class="d_content p-50 content_h" th:text="${ritem.r_date}"></div>
+                    <div class="d_content p-100 content_h" th:text="${ritem.r_contents}"></div>
+                </th:block>
+            </div>
+            <!--댓글 전송 부분-->
+            <form id="rform">
+                <input type="hidden" name="r_bnum" th:value="${board.b_num}">
+                <input type="hidden" name="r_id" th:value="${session.member.m_id}">
+                <textarea name="r_contents" rows="3" class="write-input4 ta"
+                          id="comment" placeholder="댓글을 적어주세요." style="margin-bottom: 30px"></textarea>
+                <input type="button" value="댓글 전송" class="login-btn2" id="rbtn">
+            </form>
+        </div>
+    </div>
+</section>
+<footer>
+    <th:block th:insert="~{fragments::footer3}"/>
+</footer>
+</body>
+<script th:inline="javascript">
+    //수정/삭제 버튼 숨기기
+    $("#upbtn").hide();
+    $("#delbtn").hide();
+    let mid = [[${session.member.m_id}]];//로그인한 ID
+    let bid = [[${board.b_id}]];//글 작성자 ID
+    if (mid == bid) { //두 아이디가 같다면
+        $("#upbtn").show(); //수정 버튼이 보인다
+        $("#delbtn").show(); //삭제 버튼이 보인다
+    }
+
+    $("#backbtn").click(function backbtn() {
+        let url = "/boardList?";
+        const searchDto = [[${session.sdto}]];
+        let colname = "";
+        let keyword = "";
+        if (searchDto != null) {
+            colname = searchDto.colname;
+            keyword = searchDto.keyword;
+        }
+        let page = [[${session.pageNum}]];
+
+        if (colname == null || colname == "") { //검색 안한 목록 이동
+            url += `pageNum=${page}`;
+        } else { //검색한 결과 목록으로 이동.
+            url += `colname=${colname}&keyword=${keyword}&&pageNum=${page}`;
+        }
+        console.log(url);
+        location.href = url;
+    });
+
+    $("#delbtn").click(function () {
+        let con = confirm("게시글을 삭제하시겠습니까?");
+        if (con == true) {
+            let bnum = [[${board.b_num}]];
+            location.href = `/boardDelete?b_num=${bnum}`;
+        }
+    });
+
+    $("#upbtn").click(function () {
+        let bnum = [[${board.b_num}]];
+        location.href = `/updateForm?b_num=${bnum}`;
+    });
+
+    <!--댓글 처리 부분(rest, ajax)-->
+    $("#rbtn").click(function () {
+        const rForm = $("#rform").serialize();
+
+        //restcontroller에 전송
+        $.ajax({
+            url: "replyInsert",
+            type: "post",
+            data: rForm,
+            success: function (res) {
+                console.log(res);
+                if (res != null) {
+                    let str = "";
+                    str += `
+                   <div class="t_content p-50 content_h">${res.r_id}</div>
+                    <div class="d_content p-50 content_h">${res.r_date}</div>
+                    <div class="d_content p-100 content_h">${res.r_contents}</div>
+                  `;
+                    $("#rSpace").prepend(str);
+                    $("#comment").val("");
+                } else {
+                    alert("댓글 저장 실패");
+                    $("#comment").val("");
+                    $("#comment").focus();
+                }
+            },
+            error: function (err) {
+                console.log(err);
+                alert("댓글 저장 실패");
+            }
+        });
+    });
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

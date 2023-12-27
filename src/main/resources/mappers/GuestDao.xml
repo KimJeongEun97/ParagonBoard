@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aidata.springboard02.dao.GuestDao">
+    <insert id="insertGuest" parameterType="GuestDto">
+        insert into guestbook
+        values (null,#{g_contents},#{m_id},default)
+    </insert>
+    <update id="updateGuest" parameterType="GuestDto">
+        update guestbook
+        set g_contents=#{g_contents}
+        where g_num=#{g_num}
+    </update>
+    <delete id="deleteGuestBook" parameterType="Integer">
+        delete from guestbook where g_num=#{g_num};
+    </delete>
+    <select id="selectGuestList" resultType="GuestDto" parameterType="SearchDto">
+        select * from glist
+        <if test="colname != null and colname != ''">
+            where ${colname} like concat('%',#{keyword},'%')
+        </if>
+        limit #{pageNum}, #{listCnt}
+    </select>
+    <select id="selectGuestCnt" resultType="Integer" parameterType="SearchDto">
+        select count(*) from glist
+        <if test="colname != null and colname != ''">
+            where ${colname} like concat('%',#{keyword},'%')
+        </if>
+    </select>
+    <select id="selectGuest" resultType="GuestDto" parameterType="Integer">
+        select * from glist where g_num=#{g_num}
+    </select>
+</mapper>

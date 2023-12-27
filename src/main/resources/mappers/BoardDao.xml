@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aidata.springboard02.dao.BoardDao">
+    <insert id="insertBoard" parameterType="BoardDto"
+            useGeneratedKeys="true" keyProperty="b_num">
+        <selectKey keyProperty="b_num" resultType="Integer" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into board
+        values (null,#{b_title},#{b_contents},#{b_id},default,default)
+    </insert>
+    <insert id="insertFile" parameterType="BoardFileDto">
+        insert into boardfile
+        values (null,#{bf_bnum},#{bf_oriname},#{bf_sysname})
+    </insert>
+    <insert id="insertReply" parameterType="ReplyDto" useGeneratedKeys="true"
+    keyProperty="r_num">
+    <selectKey keyProperty="r_num" resultType="Integer" order="AFTER">
+        select LAST_INSERT_ID()
+    </selectKey>
+        insert into reply
+        values (null,#{r_bnum},#{r_contents},#{r_id},default)
+    </insert>
+    <update id="updateBoard" parameterType="BoardDto">
+        update board
+        set b_title=#{b_title},b_contents=#{b_contents}
+        where b_num=#{b_num}
+    </update>
+
+    <update id="updateViewPoint" parameterType="BoardDto">
+        update board
+        set b_views = #{b_views}
+        where b_num = #{b_num}
+    </update>
+
+    <delete id="deleteBoard" parameterType="Integer">
+        delete from board where b_num=#{b_num}
+    </delete>
+    <delete id="deleteFiles" parameterType="Integer">
+        delete from boardfile where bf_bnum=#{b_num}
+    </delete>
+    <delete id="deleteReplys" parameterType="Integer">
+        delete from reply where r_bnum=#{b_num}
+    </delete>
+    <delete id="deleteFile" parameterType="String">
+        delete from boardfile where bf_sysname=#{sysname};
+    </delete>
+
+    <select id="selectBoardList" resultType="BoardDto" parameterType="SearchDto">
+        select * from blist
+        <if test="colname != null and colname != ''">
+            where ${colname} like CONCAT('%',#{keyword},'%')
+        </if>
+        limit #{pageNum}, #{listCnt}
+    </select>
+    <select id="selectBoardCnt" resultType="Integer" parameterType="SearchDto">
+        select count(*) from blist
+        <if test="colname != null and colname != ''">
+            where ${colname} like concat('%',#{keyword},'%')
+        </if>
+    </select>
+    <select id="selectBoard" resultType="BoardDto" parameterType="Integer">
+        select * from blist where b_num=#{b_num}
+    </select>
+    <select id="selectFileList" resultType="BoardFileDto" parameterType="Integer">
+            select * from boardfile where bf_bnum=#{b_num}
+    </select>
+    <select id="selectFnameList" resultType="String" parameterType="Integer">
+        select bf_sysname from boardfile where bf_bnum=#{b_num}
+    </select>
+
+    <select id="selectReplyList" resultType="ReplyDto" parameterType="Integer">
+        select * from rlist where r_bnum=#{b_num}
+    </select>
+    <select id="selectLastReply" resultType="ReplyDto" parameterType="Integer">
+        select * from rlist where r_num=#{r_num}
+    </select>
+</mapper>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail</title>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script th:inline="javascript">
+        $(function () {
+            //메시지 출력
+            let m = [[${msg}]];
+            if (m != null) {
+                alert(m);
+            } //복사하여 index.html에도 넣기
+        });
+    </script>
+</head>
+<body class="detailbackground2">
+<header>
+    <th:block th:insert="~{fragments::header(${session.member})}"/>
+</header>
+<section>
+    <div class="content">
+        <form th:action="@{gupdateProc}" class="write-form"
+              method="post" enctype="multipart/form-data">
+            <h2 class="login-header" style="color: white">방명록 수정</h2>
+            <input type="hidden" name="m_id" th:value="${guest.m_id}">
+            <input type="hidden" name="g_num" th:value="${guest.g_num}">
+            <textarea rows="15" name="g_contents" class="write-input ta"
+                      th:text="${guest.g_contents}"></textarea>
+            <div class="btn-area2">
+                <input type="submit" class="login-btn2" value="수정">
+                <input type="reset" class="login-btn2" value="글 복원">
+                <input type="button" class="login-btn2" id="backbtn" value="취소">
+            </div>
+        </form>
+    </div>
+</section>
+<footer>
+    <th:block th:insert="~{fragments::footer}"/>
+</footer>
+</body>
+<script th:inline="javascript">
+    <!--뒤로가기-->
+    $("#backbtn").click(function () {
+        let gnum = [[${guest.g_num}]];
+        location.href = `/guestDetail?b_num=${gnum}`;
+    });
+</script>
+</html>
